@@ -5,7 +5,7 @@ AI-powered document extraction, verification, and human review platform
 ACE is a microservice-based platform for ingesting enterprise documents, extracting structured compliance data with AI agents, verifying the results against source evidence, and enabling human-in-the-loop review.
 
 ## Why this project
-This project demonstrates senior-level backend, full-stack, and AI engineering by combining:
+This project demonstrates:
 - .NET Clean Architecture for enterprise workflows
 - Python AI services for extraction and verification
 - React TypeScript frontend for operational review
