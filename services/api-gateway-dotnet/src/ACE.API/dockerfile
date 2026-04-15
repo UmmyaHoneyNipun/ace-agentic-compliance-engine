@@ -1,0 +1,21 @@
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+
+COPY ACE.sln ./
+COPY src/ACE.API/ACE.API.csproj src/ACE.API/
+COPY src/ACE.Application/ACE.Application.csproj src/ACE.Application/
+COPY src/ACE.Domain/ACE.Domain.csproj src/ACE.Domain/
+COPY src/ACE.Infrastructure/ACE.Infrastructure.csproj src/ACE.Infrastructure/
+COPY src/ACE.Contracts/ACE.Contracts.csproj src/ACE.Contracts/
+COPY tests/ACE.API.Tests/ACE.API.Tests.csproj tests/ACE.API.Tests/
+
+RUN dotnet restore ACE.sln
+
+COPY . .
+RUN dotnet publish src/ACE.API/ACE.API.csproj -c Release -o /app/publish
+
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
+WORKDIR /app
+COPY --from=build /app/publish .
+EXPOSE 8080
+ENTRYPOINT ["dotnet", "ACE.API.dll"]
