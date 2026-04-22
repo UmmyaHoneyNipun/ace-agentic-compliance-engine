@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: ace-mssql
+    platform: linux/amd64
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "AceEngine#2026Secure"
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'AceEngine#2026Secure' -C -Q 'SELECT 1' || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 20
+
+  api-gateway-dotnet:
+    build:
+      context: ./services/api-gateway-dotnet
+      dockerfile: src/ACE.API/Dockerfile
+    container_name: ace-api
+    depends_on:
+      mssql:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: "Server=mssql,1433;Database=AceDb;User Id=sa;Password=AceEngine#2026Secure;TrustServerCertificate=True"
+    ports:
+      - "8080:8080"
+
+volumes:
+  mssql_data:
